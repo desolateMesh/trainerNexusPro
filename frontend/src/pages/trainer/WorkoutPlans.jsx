@@ -1,4 +1,4 @@
-// src/pages/trainer/WorkoutPlanCreation.jsx
+// src/pages/trainer/WorkoutPlans.jsx
 import React, { useState, useEffect } from 'react';
 import {
   Box,
@@ -14,6 +14,7 @@ import {
 } from '@mui/material';
 import { Plus, Trash2 } from 'lucide-react';
 import api from '../../utils/api'; // Ensure this is correctly configured
+import { createWorkoutPlan } from '../../utils/api';
 
 const EXERCISE_TYPES = [
   { value: 'HIIT', label: 'HIIT' },
@@ -77,22 +78,19 @@ const WorkoutPlanCreation = () => {
       alert('Please select a client.');
       return;
     }
-
+  
     const workoutPlanData = {
       name: planName,
       description: planDescription,
       clientId: selectedClient,
       workouts,
     };
-
+  
     try {
-      const response = await api.post('/workout-plans', workoutPlanData);
+      const response = await createWorkoutPlan(workoutPlanData);
       console.log('Workout plan created:', response.data);
       alert('Workout plan successfully created and assigned!');
-      setPlanName('');
-      setPlanDescription('');
-      setWorkouts([{ type: '', exercise: '', reps: '', sets: '', duration: '', laps: '', notes: '' }]);
-      setSelectedClient('');
+      resetForm();
     } catch (error) {
       console.error('Error creating workout plan:', error);
       alert('Failed to create workout plan.');

@@ -9,16 +9,31 @@ const trainerRoutes = require('./routes/trainerRoutes');
 const userRoutes = require('./routes/userRoutes');
 const workoutRoutes = require('./routes/workoutRoutes');
 
+
 const app = express();
 
 // Middleware to parse JSON bodies
 app.use(express.json());
 app.use(cors());  // Enable CORS if needed
+app.use(express.json());
+app.use(cors());
 
-// API routes
+
+app.use('/api/workouts', workoutRoutes);
+
+// After app.use(cors());
+app.use((req, res, next) => {
+  console.log('Request:', {
+    method: req.method,
+    url: req.originalUrl,
+    body: req.body
+  });
+  next();
+});
+
 app.post('/api/auth/login', authController.login);
 app.use('/api/trainer', trainerRoutes);
-app.use('/api/workouts', workoutRoutes);
+
 
 // Start the server and sync the database
 const PORT = process.env.PORT || 5000;

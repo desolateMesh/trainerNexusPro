@@ -1,4 +1,5 @@
 // src/pages/trainer/TrainerDashboard.jsx
+
 import React, { useState } from 'react';
 import {
   Box,
@@ -27,13 +28,16 @@ import {
 import Clients from './Clients';
 import WorkoutPlans from './WorkoutPlans';
 import WorkoutPlanCreation from './WorkoutPlanCreation';
+import Messages from './Messages';
+import VideoChat from './VideoChat';
+
 
 const TrainerDashboard = () => {
   const [activeTab, setActiveTab] = useState('schedule');
   
   // Mock data for trainer stats
   const trainerStats = {
-    activeClients: 8,
+    activeClients: 3,
     todaySessions: 4,
     weeklyHours: 24,
   };
@@ -45,8 +49,8 @@ const TrainerDashboard = () => {
   ];
 
   const clientProgress = [
-    { client: 'Sarah Johnson', achievement: 'achieved her weight goal', timeAgo: '2 days ago' },
-    { client: 'John Smith', achievement: 'completed marathon training', timeAgo: '1 week ago' },
+    { client: 'Adam Williams', achievement: 'achieved his weight goal', timeAgo: '2 days ago' },
+    { client: 'Mike Brown', achievement: 'completed marathon training', timeAgo: '1 week ago' },
   ];
 
   const tabs = [
@@ -142,14 +146,18 @@ const TrainerDashboard = () => {
         return <Clients />;
       case 'workoutPlans':
         return <WorkoutPlans />;
+        case 'messages':
+            return <Messages />;
+        case 'videochat':
+            return <VideoChat />;
       default:
-        return (
-          <Box sx={{ textAlign: 'center', color: 'text.secondary', py: 4 }}>
-            Content for {tabs.find(t => t.id === tabId)?.label} tab coming soon...
-          </Box>
-        );
+            return (
+                <Box sx={{ textAlign: 'center', color: 'text.secondary', py: 4 }}>
+                    Content for {tabs.find(t => t.id === tabId)?.label} tab coming soon...
+                </Box>
+            );
     }
-  };
+};
 
   // Get username from localStorage
   const userData = JSON.parse(localStorage.getItem('user')) || {};
@@ -243,8 +251,6 @@ const TrainerDashboard = () => {
               {/* Tab Content */}
               <Box sx={{ p: 3 }}>
                 {renderTabContent(activeTab)}
-  
-                
               </Box>
             </Paper>
           </Grid>

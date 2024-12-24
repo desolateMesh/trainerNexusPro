@@ -5,6 +5,8 @@ import LandingPage from './pages/landing/LandingPage';
 import TrainerDashboard from './pages/trainer/TrainerDashboard';
 import ClientDashboard from './pages/client/ClientDashboard';
 import { ClientsProvider } from './store/ClientsContext';
+import VideoChat from './pages/trainer/VideoChat';
+import Messages from './pages/trainer/Messages';
 
 function App() {
   return (
@@ -19,6 +21,10 @@ function App() {
 
           {/* Trainer Section */}
           <Route path="/trainer-dashboard" element={<TrainerDashboard />} />
+          <Route path="/workout-plans" element={<TrainerDashboard />} />
+          <Route path="/trainer/video-chat" element={<VideoChat />} />
+          <Route path="/trainer/messages" element={<Messages />} />
+          
 
           {/* Client Section */}
           <Route path="/client-dashboard" element={<ClientDashboard />} />
