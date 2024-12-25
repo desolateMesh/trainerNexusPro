@@ -8,6 +8,8 @@ const authController = require('./controllers/authController');
 const trainerRoutes = require('./routes/trainerRoutes');
 const userRoutes = require('./routes/userRoutes');
 const workoutRoutes = require('./routes/workoutRoutes');
+const clientWorkoutsRouter = require('./routes/clientWorkouts');
+
 
 const app = express();
 
@@ -29,7 +31,9 @@ app.use((req, res, next) => {
 app.use('/api/auth', authController.login);
 app.use('/api/workouts', workoutRoutes); 
 app.use('/api/trainer', trainerRoutes); 
-app.use('/api/users', userRoutes); 
+app.use('/api/users', userRoutes);
+app.use('/api/client-workouts', clientWorkoutsRouter);
+app.use('/api/client-workouts', require('./routes/clientWorkouts'));
 
 // Start the server and sync the database
 const PORT = process.env.PORT || 5000;

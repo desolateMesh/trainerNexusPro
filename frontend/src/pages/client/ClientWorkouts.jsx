@@ -1,190 +1,113 @@
-// C:\Users\jrochau\projects\trainerNexus\frontend\src\pages\client\ClientWorkouts.jsx
-
 import React, { useState, useEffect } from 'react';
 import {
-  Box,
-  Typography,
-  Paper,
-  Checkbox,
-  Button,
-  Grid,
-  LinearProgress,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  TextField,
-  CircularProgress,
-  Alert,
+  Box, Typography, Paper, Grid,
+  Accordion, AccordionSummary, AccordionDetails,
+  CircularProgress, Alert, Button
 } from '@mui/material';
-import { ChevronDown, Play, CheckCircle } from 'lucide-react';
-import { fetchClientWorkouts } from '../../utils/api';
+import { ChevronDown } from 'lucide-react';
 
 const ClientWorkout = () => {
   const [workoutPlan, setWorkoutPlan] = useState(null);
-  const [completedExercises, setCompletedExercises] = useState({});
-  const [notes, setNotes] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [completedWorkouts, setCompletedWorkouts] = useState({}); // Initialize state to track completed workouts
 
   useEffect(() => {
-    const fetchWorkoutPlan = async () => {
-      try {
-        const clientId = 9; // For testing with Amanda's ID
-        const response = await fetchClientWorkouts(clientId);
-        console.log('Workout response:', response); // Debug
-        
-        if (response.data && response.data.length > 0) {
-          setWorkoutPlan(response.data[0]);
-        } else {
-          setError('No workouts assigned yet.');
-        }
-      } catch (err) {
-        console.error('Error:', err);
-        setError(err.message || 'Failed to fetch workouts');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchWorkoutPlan();
+    fetchWorkout();
   }, []);
 
-  const handleExerciseComplete = (index) => {
-    setCompletedExercises((prev) => ({
-      ...prev,
-      [index]: !prev[index],
-    }));
+  const fetchWorkout = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://localhost:5000/api/client-workouts/assigned', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      if (!response.ok) throw new Error('Failed to fetch workout');
+      const data = await response.json();
+      setWorkoutPlan(data);
+
+      // Initialize completed state for workouts
+      const initialCompletedState = {};
+      data.forEach((exercise) => {
+        initialCompletedState[exercise.workout_id] = false;
+      });
+      setCompletedWorkouts(initialCompletedState);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleNotesChange = (index, value) => {
-    setNotes((prev) => ({
-      ...prev,
-      [index]: value,
-    }));
+  const handleCompleteWorkout = async (workoutId) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://localhost:5000/api/client-workouts/${workoutId}/complete`, {
+        method: 'PATCH',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) throw new Error('Failed to mark workout as complete');
+      setCompletedWorkouts((prev) => ({ ...prev, [workoutId]: true }));
+    } catch (err) {
+      console.error(err);
+      setError(err.message);
+    }
   };
 
-  const calculateProgress = () => {
-    if (!workoutPlan) return 0;
-    const completed = Object.values(completedExercises).filter((v) => v).length;
-    return (completed / workoutPlan.workouts.length) * 100;
-  };
-
-  const handleSubmitWorkout = () => {
-    const workoutData = {
-      planId: workoutPlan.id,
-      completed: completedExercises,
-      notes: notes,
-      completedAt: new Date().toISOString(),
-    };
-    console.log('Submitting workout:', workoutData);
-    // TODO: Implement API call to save workout completion
-  };
-
-  if (loading) {
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 5 }}>
-        <CircularProgress />
-      </Box>
-    );
-  }
-
-  if (error) {
-    return (
-      <Box sx={{ mt: 5, textAlign: 'center' }}>
-        <Alert severity="error">{error}</Alert>
-      </Box>
-    );
-  }
-
-  if (!workoutPlan) {
-    return (
-      <Typography variant="h6" sx={{ mt: 5, textAlign: 'center' }}>
-        No workout plan available.
-      </Typography>
-    );
-  }
+  if (loading) return <Box sx={{ display: 'flex', justifyContent: 'center', mt: 5 }}><CircularProgress /></Box>;
+  if (error) return <Box sx={{ mt: 5 }}><Alert severity="error">{error}</Alert></Box>;
+  if (!workoutPlan) return <Typography variant="h6" sx={{ mt: 5, textAlign: 'center' }}>No assigned workouts.</Typography>;
 
   return (
     <Box>
       <Paper sx={{ p: 3, mb: 3 }}>
-        <Typography variant="h5" gutterBottom>
-          {workoutPlan.name}
-        </Typography>
-        <Typography color="text.secondary" gutterBottom>
-          {workoutPlan.description}
-        </Typography>
-        <Box sx={{ mt: 2 }}>
-          <Typography variant="body2" gutterBottom>
-            Progress
-          </Typography>
-          <LinearProgress
-            variant="determinate"
-            value={calculateProgress()}
-            sx={{ height: 10, borderRadius: 5 }}
-          />
-          <Typography variant="body2" sx={{ mt: 1 }}>
-            {Math.round(calculateProgress())}% Complete
-          </Typography>
-        </Box>
+        <Typography variant="h5" gutterBottom>{workoutPlan[0]?.workout_name}</Typography>
+        <Typography color="text.secondary" gutterBottom>{workoutPlan[0]?.workout_description}</Typography>
       </Paper>
 
       <Grid container spacing={3}>
-        {workoutPlan.workouts.map((workout, index) => (
+        {workoutPlan.map((exercise, index) => (
           <Grid item xs={12} key={index}>
             <Accordion>
               <AccordionSummary expandIcon={<ChevronDown />}>
-                <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-                  <Checkbox
-                    checked={completedExercises[index] || false}
-                    onChange={() => handleExerciseComplete(index)}
-                    onClick={(e) => e.stopPropagation()}
-                  />
-                  <Typography sx={{ flex: 1 }}>{workout.exercise}</Typography>
-                  {workout.videos && workout.videos.length > 0 && (
-                    <Button
-                      startIcon={<Play />}
-                      size="small"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        console.log('Play video:', workout.videos[0]);
-                      }}
-                    >
-                      Watch Tutorial
-                    </Button>
-                  )}
-                </Box>
+                <Typography>{exercise.exercise}</Typography>
               </AccordionSummary>
               <AccordionDetails>
                 <Grid container spacing={2}>
                   <Grid item xs={12}>
                     <Typography variant="body2" color="text.secondary">
-                      Type: {workout.type}
+                      Type: {exercise.type}
                     </Typography>
-                    {workout.reps && (
+                    {exercise.reps > 0 && (
                       <Typography variant="body2">
-                        Reps: {workout.reps} × Sets: {workout.sets}
+                        Reps: {exercise.reps} × Sets: {exercise.sets}
                       </Typography>
                     )}
-                    {workout.duration && (
+                    {exercise.duration > 0 && (
                       <Typography variant="body2">
-                        Duration: {workout.duration}s × Sets: {workout.sets}
+                        Duration: {exercise.duration}s × Sets: {exercise.sets}
                       </Typography>
                     )}
-                    <Typography variant="body2" sx={{ mt: 1 }}>
-                      Instructions: {workout.notes}
-                    </Typography>
+                    {exercise.notes && (
+                      <Typography variant="body2" sx={{ mt: 1 }}>
+                        Instructions: {exercise.notes}
+                      </Typography>
+                    )}
                   </Grid>
                   <Grid item xs={12}>
-                    <TextField
-                      fullWidth
-                      multiline
-                      rows={2}
-                      label="Your Notes"
-                      value={notes[index] || ''}
-                      onChange={(e) => handleNotesChange(index, e.target.value)}
-                      variant="outlined"
-                      size="small"
-                    />
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={() => handleCompleteWorkout(exercise.workout_id)}
+                      disabled={completedWorkouts[exercise.workout_id]}
+                    >
+                      {completedWorkouts[exercise.workout_id] ? 'Completed' : 'Mark as Complete'}
+                    </Button>
                   </Grid>
                 </Grid>
               </AccordionDetails>
@@ -192,21 +115,8 @@ const ClientWorkout = () => {
           </Grid>
         ))}
       </Grid>
-
-      <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end' }}>
-        <Button
-          variant="contained"
-          color="primary"
-          startIcon={<CheckCircle />}
-          onClick={handleSubmitWorkout}
-          disabled={calculateProgress() < 100}
-        >
-          Complete Workout
-        </Button>
-      </Box>
     </Box>
   );
 };
 
 export default ClientWorkout;
-
