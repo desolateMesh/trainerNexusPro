@@ -1,4 +1,4 @@
-// src/pages/client/ClientDashboard.jsx
+// C:\Users\jrochau\projects\trainerNexus\frontend\src\pages\client\ClientDashboard.jsx
 import React, { useState } from 'react';
 import {
   Box,

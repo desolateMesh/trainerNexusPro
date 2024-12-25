@@ -1,3 +1,5 @@
+// C:\Users\jrochau\projects\trainerNexus\frontend\src\pages\trainer\WorkoutPlanCreation.jsx
+
 import React, { useState, useEffect } from 'react';
 import {
   Box,

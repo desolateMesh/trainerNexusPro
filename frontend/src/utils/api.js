@@ -30,7 +30,9 @@ export const createWorkoutPlan = (data) => api.post('/workouts/create', {
   }))
 });
 
-export const fetchClientWorkouts = (clientId) => api.get(`/workout-plans/client/${clientId}`);
+export const fetchClientWorkouts = async (clientId) => {
+  return await axios.get(`/api/client-workouts/${clientId}`);
+};
 export const fetchTrainerClients = (trainerId) => api.get(`/trainer/clients/${trainerId}`);
 
 export default api;

@@ -1,3 +1,5 @@
+// C:\Users\jrochau\projects\trainerNexus\frontend\src\pages\client\ClientWorkouts.jsx
+
 import React, { useState, useEffect } from 'react';
 import {
   Box,
@@ -27,20 +29,18 @@ const ClientWorkout = () => {
   useEffect(() => {
     const fetchWorkoutPlan = async () => {
       try {
-        const clientId = localStorage.getItem('userId'); // Assuming you store the client's ID in localStorage
-        if (!clientId) {
-          throw new Error('Unauthorized: Not a client');
-        }
-
+        const clientId = 9; // For testing with Amanda's ID
         const response = await fetchClientWorkouts(clientId);
-        if (response.data.length === 0) {
-          setError('No workouts assigned yet.');
+        console.log('Workout response:', response); // Debug
+        
+        if (response.data && response.data.length > 0) {
+          setWorkoutPlan(response.data[0]);
         } else {
-          setWorkoutPlan(response.data[0]); // Assuming one workout is assigned at a time
+          setError('No workouts assigned yet.');
         }
       } catch (err) {
-        console.error('Error fetching workout plans:', err);
-        setError(err.message || 'Failed to fetch workout plans');
+        console.error('Error:', err);
+        setError(err.message || 'Failed to fetch workouts');
       } finally {
         setLoading(false);
       }
