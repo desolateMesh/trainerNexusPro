@@ -30,6 +30,7 @@ import WorkoutPlans from './WorkoutPlans';
 import WorkoutPlanCreation from './WorkoutPlanCreation';
 import Messages from './Messages';
 import VideoChat from './VideoChat';
+import Schedule from './Schedule';
 
 
 const TrainerDashboard = () => {
@@ -42,11 +43,11 @@ const TrainerDashboard = () => {
     weeklyHours: 24,
   };
 
-  const todaySchedule = [
+  /* const todaySchedule = [
     { time: '9:00 AM', client: 'Adam Williams', type: 'Strength Training' },
     { time: '11:00 AM', client: 'Jason Rochau', type: 'HIIT Session' },
     { time: '2:00 PM', client: 'Mike Brown', type: 'Flexibility & Mobility' },
-  ];
+  ]; */
 
   const clientProgress = [
     { client: 'Adam Williams', achievement: 'achieved his weight goal', timeAgo: '2 days ago' },
@@ -90,74 +91,23 @@ const TrainerDashboard = () => {
   const renderTabContent = (tabId) => {
     switch(tabId) {
       case 'schedule':
-        return (
-          <Grid container spacing={3}>
-            <Grid item xs={12} md={8}>
-              <Paper sx={{ p: 3 }}>
-                <Typography variant="h6" gutterBottom>
-                  Today's Schedule
-                </Typography>
-                <List>
-                  {todaySchedule.map((session, index) => (
-                    <React.Fragment key={index}>
-                      <ListItem>
-                        <ListItemText
-                          primary={
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                              <Typography variant="subtitle1" fontWeight="medium">
-                                {session.time} - {session.client}
-                              </Typography>
-                              <Typography variant="body2" color="text.secondary">
-                                {session.type}
-                              </Typography>
-                            </Box>
-                          }
-                        />
-                      </ListItem>
-                      {index < todaySchedule.length - 1 && <Divider />}
-                    </React.Fragment>
-                  ))}
-                </List>
-              </Paper>
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <Paper sx={{ p: 3 }}>
-                <Typography variant="h6" gutterBottom>
-                  Recent Client Progress
-                </Typography>
-                <List>
-                  {clientProgress.map((progress, index) => (
-                    <React.Fragment key={index}>
-                      <ListItem>
-                        <ListItemText
-                          primary={`${progress.client} ${progress.achievement}`}
-                          secondary={progress.timeAgo}
-                        />
-                      </ListItem>
-                      {index < clientProgress.length - 1 && <Divider />}
-                    </React.Fragment>
-                  ))}
-                </List>
-              </Paper>
-            </Grid>
-          </Grid>
-        );
+        return <Schedule />;
       case 'clients':
         return <Clients />;
       case 'workoutPlans':
         return <WorkoutPlans />;
-        case 'messages':
-            return <Messages />;
-        case 'videochat':
-            return <VideoChat />;
+      case 'messages':
+        return <Messages />;
+      case 'videochat':
+        return <VideoChat />;
       default:
-            return (
-                <Box sx={{ textAlign: 'center', color: 'text.secondary', py: 4 }}>
-                    Content for {tabs.find(t => t.id === tabId)?.label} tab coming soon...
-                </Box>
-            );
+        return (
+          <Box sx={{ textAlign: 'center', color: 'text.secondary', py: 4 }}>
+            Content for {tabs.find(t => t.id === tabId)?.label} tab coming soon...
+          </Box>
+        );
     }
-};
+  };
 
   // Get username from localStorage
   const userData = JSON.parse(localStorage.getItem('user')) || {};

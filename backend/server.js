@@ -34,6 +34,7 @@ app.use('/api/trainer', trainerRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/client-workouts', clientWorkoutsRouter);
 app.use('/api/client-workouts', require('./routes/clientWorkouts'));
+app.use('/api/training-sessions', require('./routes/scheduleRoutes'));
 
 // Start the server and sync the database
 const PORT = process.env.PORT || 5000;
